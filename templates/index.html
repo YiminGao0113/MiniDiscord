@@ -9,16 +9,20 @@ Demo App
 <link rel="stylesheet" href="{{url_for('.static', filename='starter-template.css')}}">
 {% endblock %}
 
-{% block content %}
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
+{% block content %}    
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
         <div class="navbar-header">
+
+
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
+
           <a class="navbar-brand" href="#">MiniDiscord</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
@@ -26,7 +30,8 @@ Demo App
             <li class="active"><a href="#">Home</a></li>
             <li><a href="{{ url_for('login') }}">Login</a></li>
             <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
-
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
             <li><a href="http://yimingao.com">--->To my page</a></li>
           </ul>
         </div><!--/.nav-collapse -->

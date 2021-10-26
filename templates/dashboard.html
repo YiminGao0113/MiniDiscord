@@ -7,6 +7,54 @@ Dashboard
 {% block styles %}
 {{super()}}
 <link rel="stylesheet" href="{{url_for('.static', filename='dashboard.css')}}">
+
+<script>
+  
+function scrollSmoothToBottom(id) {
+  var div = document.getElementById(id);
+  $("#" + id).animate(
+    {
+      scrollTop: div.scrollHeight - div.clientHeight,
+    },
+    500
+  );
+}
+
+</script>
+<style>
+.mainformat{
+    position: absolute;
+    height: 75vh;
+    width: 160vh;
+  /*background-color: powderblue;*/
+  overflow-y: scroll;
+  overflow-x: hidden;
+
+}
+
+.chat{
+    position: absolute;
+    top: 85vh;
+    min-height: 5vh;
+    min-width: 140vh;
+    font-size: 20px;
+    font-family:courier;
+}
+
+.sendButton{
+    position: absolute;
+    top: 85vh;
+    left:  150vh;
+    min-width: 10vh;
+    min-height: 5vh;
+    font-family:courier;
+
+    font-size: 20px;
+
+}
+
+</style>
+
 {% endblock %}
 
 {% block content %}
@@ -24,15 +72,14 @@ Dashboard
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
             <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Settings</a></li>
-            <li><a href="#">Profile</a></li>
-            <li><a href="{{url_for('logout')}}">Log Out</a></li>
+            <li><a href="http://127.0.0.1:5000/logout/{{name}}">Log Out</a></li>
+
 
             <li><a href="http://yimingao.com">--->To my page</a></li>
           </ul>
-          <form class="navbar-form navbar-right">
+<!--           <form class="navbar-form navbar-right">
             <input type="text" class="form-control" placeholder="Search...">
-          </form>
+          </form> -->
         </div>
       </div>
     </nav>
@@ -41,179 +88,67 @@ Dashboard
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
-            <li><a href="#">Reports</a></li>
-            <li><a href="#">Analytics</a></li>
-            <li><a href="#">Export</a></li>
-          </ul>
-          <ul class="nav nav-sidebar">
-            <li><a href="">Nav item</a></li>
-            <li><a href="">Nav item again</a></li>
-            <li><a href="">One more nav</a></li>
-            <li><a href="">Another nav item</a></li>
-            <li><a href="">More navigation</a></li>
-          </ul>
-          <ul class="nav nav-sidebar">
-            <li><a href="">Nav item again</a></li>
-            <li><a href="">One more nav</a></li>
-            <li><a href="">Another nav item</a></li>
+            <li class="active"><a href="#">{{name}} <span class="sr-only">(current)</span></a></li>
+
+
+            {% for usr in users %}
+              {% set m1 = usr["online"] %}
+              {% set m2 = usr["username"] %}
+              {% if m1 == 1 %}
+                {% if m2 != name%}
+                  <li><a href="#">{{usr["username"]}}   (online)</a></li>
+                {% endif%}
+              {% else %}
+                  <li><a href="#">{{usr["username"]}}   (offline)</a></li>
+              {% endif%}
+            {% endfor %}
+            <!-- <p>123123123</p> -->
+
+        <!-- <input type="submit" name="123123" onclick="scrollSmoothToBottom('chatarea')"> -->
           </ul>
         </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Welcome, {{ name }}</h1>
 
-          <div class="row placeholders">
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Label</h4>
-              <span class="text-muted">Something else</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Label</h4>
-              <span class="text-muted">Something else</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Label</h4>
-              <span class="text-muted">Something else</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Label</h4>
-              <span class="text-muted">Something else</span>
-            </div>
-          </div>
-
-          <h2 class="sub-header">Section title</h2>
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1,001</td>
-                  <td>Lorem</td>
-                  <td>ipsum</td>
-                  <td>dolor</td>
-                  <td>sit</td>
-                </tr>
-                <tr>
-                  <td>1,002</td>
-                  <td>amet</td>
-                  <td>consectetur</td>
-                  <td>adipiscing</td>
-                  <td>elit</td>
-                </tr>
-                <tr>
-                  <td>1,003</td>
-                  <td>Integer</td>
-                  <td>nec</td>
-                  <td>odio</td>
-                  <td>Praesent</td>
-                </tr>
-                <tr>
-                  <td>1,003</td>
-                  <td>libero</td>
-                  <td>Sed</td>
-                  <td>cursus</td>
-                  <td>ante</td>
-                </tr>
-                <tr>
-                  <td>1,004</td>
-                  <td>dapibus</td>
-                  <td>diam</td>
-                  <td>Sed</td>
-                  <td>nisi</td>
-                </tr>
-                <tr>
-                  <td>1,005</td>
-                  <td>Nulla</td>
-                  <td>quis</td>
-                  <td>sem</td>
-                  <td>at</td>
-                </tr>
-                <tr>
-                  <td>1,006</td>
-                  <td>nibh</td>
-                  <td>elementum</td>
-                  <td>imperdiet</td>
-                  <td>Duis</td>
-                </tr>
-                <tr>
-                  <td>1,007</td>
-                  <td>sagittis</td>
-                  <td>ipsum</td>
-                  <td>Praesent</td>
-                  <td>mauris</td>
-                </tr>
-                <tr>
-                  <td>1,008</td>
-                  <td>Fusce</td>
-                  <td>nec</td>
-                  <td>tellus</td>
-                  <td>sed</td>
-                </tr>
-                <tr>
-                  <td>1,009</td>
-                  <td>augue</td>
-                  <td>semper</td>
-                  <td>porta</td>
-                  <td>Mauris</td>
-                </tr>
-                <tr>
-                  <td>1,010</td>
-                  <td>massa</td>
-                  <td>Vestibulum</td>
-                  <td>lacinia</td>
-                  <td>arcu</td>
-                </tr>
-                <tr>
-                  <td>1,011</td>
-                  <td>eget</td>
-                  <td>nulla</td>
-                  <td>Class</td>
-                  <td>aptent</td>
-                </tr>
-                <tr>
-                  <td>1,012</td>
-                  <td>taciti</td>
-                  <td>sociosqu</td>
-                  <td>ad</td>
-                  <td>litora</td>
-                </tr>
-                <tr>
-                  <td>1,013</td>
-                  <td>torquent</td>
-                  <td>per</td>
-                  <td>conubia</td>
-                  <td>nostra</td>
-                </tr>
-                <tr>
-                  <td>1,014</td>
-                  <td>per</td>
-                  <td>inceptos</td>
-                  <td>himenaeos</td>
-                  <td>Curabitur</td>
-                </tr>
-                <tr>
-                  <td>1,015</td>
-                  <td>sodales</td>
-                  <td>ligula</td>
-                  <td>in</td>
-                  <td>libero</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
       </div>
     </div>
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header">Chatroom(Signed in as {{ name }})</h1>
+
+        <div class="mainformat" id="chatarea">
+<!--            <h5 align="right" style="font-family:courier; 
+    font-size: 20px;color:blue; margin-right: 20px;">
+            {{name}}
+          </h5>
+          <h5 align="right" style="font-family:courier; 
+    font-size: 20px;color:blue; margin-right: 20px;">
+            Test test test!!!
+          </h5>
+          <p align="left" style="font-family:courier; 
+    font-size: 20px;color:green; margin-left: 20px;">
+            Vincent
+          </p>
+          <h5 align="left" style="font-family:courier; 
+    font-size: 20px;color:green; margin-left: 20px;">
+            Test test test!!! -->
+          <!-- </h5> -->
+        {% for msg in msgs %}
+          {% set m = msg["client"] %}
+          {% if m == name %}
+            <h5 align="right" style="font-family:courier; font-size: 20px;color:green; margin-right: 20px;">{{msg["client"]}}  @  {{msg["time"]}}</h5>
+              <h5 align="right" style="font-family:courier; font-size: 20px;color:green; margin-right: 20px;"> {{msg["message"]}}</h5>
+          {% else %}
+            <h5 align="left" style="font-family:courier; font-size: 20px;color:blue; margin-right: 20px;">{{msg["client"]}}  @  {{msg["time"]}}</h5>
+              <h5 align="left" style="font-family:courier; font-size: 20px;color:blue; margin-right: 20px;"> {{msg["message"]}}</h5>
+          {% endif %}
+        {% endfor %}
+
+        </div>
+    
+
+        <form method="POST" action="#">
+          <input class="chat" type="text" name="msg" id="msg">
+          <input class="sendButton" type="submit" value="Send" onclick="scrollSmoothToBottom('chatarea')">
+        </form>
+
+
 {% endblock %}

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash, request
+from flask import Flask, render_template, redirect, url_for, flash, request, session, jsonify
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField
@@ -10,17 +10,22 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 import smtplib, ssl
 from datetime import datetime
 import time
-
+from flask_socketio import SocketIO
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import sqlite3
+from sqlite3 import Error
+
+FILE = "database.db"
+LIMIT = 20
 app = Flask(__name__)
 clients = {}
 app.config['SECRET_KEY'] = 'youwontguessthiskey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 Bootstrap(app)
 db = SQLAlchemy(app)
-
+socketio = SocketIO(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -76,6 +81,7 @@ def login():
                     login_user(user, remember=form.remember.data)
                     user.online = True
                     db.session.commit()
+                    session['name'] = user.username
                     return redirect(url_for('dashboard'))
                 flash("Wrong password!", "info")
             else:
@@ -112,39 +118,57 @@ def signup():
 @app.route('/dashboard',methods=['GET','POST'])
 @login_required
 def dashboard():
+    return render_template('dashboard.html', **{"session": session}, name= session['name'], users = get_users())
 
 
-    if request.method == "POST":
-        msg = request.form["msg"]
-        if msg:
-            new_message = Messages(client=current_user.username, message=msg,time=datetime.now())
-            db.session.add(new_message)
-            db.session.commit()
-            return redirect(url_for('dashboard'))
-
-
-    return render_template('dashboard.html', name=current_user.username, msgs=get_messages(), users=get_users())
-
-
-
+@app.route("/get_messages")
 def get_messages():
-    msgs = Messages.query.all()
-    return msgs
+
+    conn = sqlite3.connect(FILE)
+    cursor = conn.cursor()
+    query = "SELECT * FROM Messages"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    results = []
+    for r in sorted(result, key=lambda x: x[3], reverse=True)[:LIMIT]:
+        id, name, content, date = r
+        data = {"name":name, "message":content, "time":str(date)}
+        results.append(data)
+    msgs = list(reversed(results))
+
+    return jsonify(msgs)
+
+
+@app.route("/get_name")
+def get_name():
+    """
+    :return: a json object storing name of logged in user
+    """
+    data = {"name": ""}
+    if 'name' in session:
+        data = {"name": session['name']}
+    return jsonify(data)
 
 
 def get_users():
     users = User.query.all()
     return users
 
-@app.route('/logout/<name>')
+@app.route("/logout")
 @login_required
-def logout(name):
-    logout_user()
-    user=User.query.filter_by(username=name).first()
+def logout():
+    """
+    logs the user out by popping name from session
+    :return: None
+    """
+    user=User.query.filter_by(username=session['name']).first()
     user.online = False
     db.session.commit()
-    flash("You have logged out!")
-    return redirect(url_for('index'))
+    logout_user()
+    session.pop('name', None) 
+    flash("You were logged out.")
+    return redirect(url_for("index"))
+
 
 def send_email(user):
 
@@ -163,11 +187,10 @@ def send_email(user):
     text = "Welcome to yimindiscord, please click the link here to acctivate your account:"
     html = f"""\
     <html>
-      <head></head>
+      <head>YiminDiscord</head>
       <body>
-        <p>Welcome to yimindiscord! Please click the link here to activate your account:<a href="http://yimindiscord:5000/{user.username}">Activate</a>
-
-        </p>
+        <p>Welcome to yimindiscord! Please click the link here to activate your account: <p>
+        <a href="http://yimindiscord.com:5000/{user.username}">Activate</a></p>
       </body>
     </html>
     """
@@ -199,7 +222,26 @@ def confirm_email(name):
 
 
 
+# COMMUNICATION FUNCTIONS
 
+
+@socketio.on('event')
+def handle_my_custom_event(json, methods=['GET', 'POST']):
+    """
+    handles saving messages once received from web server
+    and sending message to other clients
+    :param json: json
+    :param methods: POST GET
+    :return: None
+    """
+    data = dict(json)
+    print(data)
+    if "name" in data:
+        new_message = Messages(client=data["name"], message=data["message"],time=datetime.now())
+        db.session.add(new_message)
+        db.session.commit()
+
+    socketio.emit('message response', json)
 
 
 
@@ -207,4 +249,5 @@ def confirm_email(name):
 if __name__ == '__main__':
     # db.create_all()
     # app.run(debug=True)
-    app.run(host='0.0.0.0')
+    # app.run(host='0.0.0.0')
+    socketio.run(app, debug=True, host='0.0.0.0')

@@ -109,7 +109,7 @@ def signup():
             send_email(new_user)
             db.session.add(new_user)
             db.session.commit()
-            flash("Please click the link we sent to your email to activate the account!", "info")
+            flash("Please click the link we sent to your email to activate the account!")
             return redirect(url_for('login'))
         except Exception as e:
             print(e)

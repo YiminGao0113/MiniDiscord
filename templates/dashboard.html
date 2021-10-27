@@ -1,7 +1,7 @@
 {% extends "bootstrap/base.html" %}
 
 {% block title %}
-Dashboard
+YiminDiscord
 {% endblock %}
 
 {% block styles %}
@@ -17,7 +17,7 @@ Dashboard
 .mainformat{
     position: relative;
     height: 70vh;
-    width:  100%;
+    width: 100%;
   /*background-color: powderblue;*/
   overflow-y: scroll;
   overflow-x: hidden;
@@ -25,18 +25,18 @@ Dashboard
 }
 
 .chat{
-    position: fixed;
-    top: 90%;
-    height: 5vh;
-    width: 70%;
+    position: absolute;
+    top: 85vh;
+    min-height: 5vh;
+    min-width: 120vh;
     font-size: 20px;
     font-family:courier;
 }
 
 .sendButton{
-    position: fixed;
-    top: 90%;
-    left:  90%;
+    position: absolute;
+    top: 85vh;
+    left:  130vh;
     min-width: 10vh;
     min-height: 5vh;
     font-family:courier;
@@ -64,7 +64,7 @@ Dashboard
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
             <li><a href="#">Dashboard</a></li>
-            <li><a href="http://127.0.0.1:5000/logout}">Log Out</a></li>
+	    <li><a href={{ url_for('logout') }}>Log Out</a></li>
 
 
             <li><a href="http://yimingao.com">--->To my page</a></li>

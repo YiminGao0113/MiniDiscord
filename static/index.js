@@ -11,7 +11,7 @@ async function add_messages(msg, scroll) {
     console.log(global_name)
     console.log(msg.name)
     var content =      
-    '<h5 align="left" style="font-family:courier" ' + 
+    '<h5 align="left"' + 
     'font-size: 20px color:blue  margin-right: 20px>' +
     msg.name  + '@' + n +  '</h5><p align="left">' + msg.message +
     '</p>';
@@ -20,8 +20,12 @@ async function add_messages(msg, scroll) {
     var content = '<h5 align="right" style="font-family:courier" ' + 
     'font-size: 20px color:green  margin-right: 20px>' +
     msg.name  + '@' + n + '</h5><p align="right">' + msg.message +
-    '</p>'
+    '</p>';
     }
+
+    content.font = 'font-family:courier';
+    content.color = 'green'
+    content = content.fontsize(5)
     // update div
     var messageDiv = document.getElementById("messages");
     messageDiv.innerHTML += content;
@@ -144,6 +148,7 @@ socket.on("disconnect", async function (msg) {
 socket.on("message response", function (msg) {
   add_messages(msg, true);
 });
+
 
 window.onload = async function () {
   var msgs = await load_messages();

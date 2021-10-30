@@ -10,22 +10,27 @@ async function add_messages(msg, scroll) {
     var global_name = await load_name();
     console.log(global_name)
     console.log(msg.name)
-    var content =      
-    '<h5 align="left"' + 
-    'font-size: 20px color:blue  margin-right: 20px>' +
-    msg.name  + '@' + n +  '</h5><p align="left">' + msg.message +
+    
+    if (msg.name=="host"){
+	  var content =      
+    '</p><p class="infosent" align="left">' + msg.message +
     '</p>';
+
+
+
+    }else{
+	  var content =      
+    '<p class="namesent" align="left"' + 
+    'font-size: 20px color:blue  margin-right: 20px>' +
+    msg.name  + '@' + n +  '</p><p class="msgsent" align="left">' + msg.message +
+    '</p>';}
 
     if (global_name == msg.name) {
-    var content = '<h5 align="right" style="font-family:courier" ' + 
+    var content = '<p class="namesent" align="right" style="font-family:courier" ' + 
     'font-size: 20px color:green  margin-right: 20px>' +
-    msg.name  + '@' + n + '</h5><p align="right">' + msg.message +
+    msg.name  + '@' + n + '</p><p class="msgsent" align="right">' + msg.message +
     '</p>';
     }
-
-    content.font = 'font-family:courier';
-    content.color = 'green'
-    content = content.fontsize(5)
     // update div
     var messageDiv = document.getElementById("messages");
     messageDiv.innerHTML += content;
@@ -77,6 +82,7 @@ $(function () {
   });
 });
 
+
 function scrollSmoothToBottom(id) {
   var div = document.getElementById(id);
   $("#" + id).animate(
@@ -112,12 +118,22 @@ function dateNow() {
   return cur_day + " " + hours + ":" + minutes;
 }
 
+
+
+
+
+
+
+
+
+
 var socket = io.connect("http://" + document.domain + ":" + location.port);
 socket.on("connect", async function () {
   var usr_name = await load_name();
   if (usr_name != "") {
     socket.emit("event", {
       message: usr_name + " just connected to the server!",
+      name: "host",
       connect: true,
     });
   }
@@ -139,10 +155,10 @@ socket.on("connect", async function () {
     });
   });
 });
-socket.on("disconnect", async function (msg) {
-  var usr_name = await load_name();
+socket.on("disconnect", async function (usr_name) {
   socket.emit("event", {
-    message: usr_name + " just left the server...",
+    message: document.getElementById('uname').innerHTML + " just left the server...",
+    name: "host",
   });
 });
 socket.on("message response", function (msg) {

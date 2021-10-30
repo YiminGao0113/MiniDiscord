@@ -13,7 +13,7 @@ import time
 from flask_socketio import SocketIO
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
+import json
 import sqlite3
 from sqlite3 import Error
 
@@ -132,9 +132,15 @@ def get_messages():
     results = []
     for r in sorted(result, key=lambda x: x[3], reverse=True)[:LIMIT]:
         id, name, content, date = r
+        if (name == "host"):
+            continue
         data = {"name":name, "message":content, "time":str(date)}
         results.append(data)
-    msgs = list(reversed(results))
+    
+
+
+    msgs = remove_seconds_from_messages(results)
+    msgs = list(reversed(msgs))
 
     return jsonify(msgs)
 
@@ -161,6 +167,10 @@ def logout():
     logs the user out by popping name from session
     :return: None
     """
+    data = {"name":"host", "message":f"{session['name']} has left the channel", "time":f"{datetime.now()}"}
+    s = json.dumps(data, indent=2)
+    print(s)
+    socketio.emit('message response', s)
     user=User.query.filter_by(username=session['name']).first()
     user.online = False
     db.session.commit()
@@ -240,10 +250,30 @@ def handle_my_custom_event(json, methods=['GET', 'POST']):
         new_message = Messages(client=data["name"], message=data["message"],time=datetime.now())
         db.session.add(new_message)
         db.session.commit()
-
+    
     socketio.emit('message response', json)
 
+# UTILITIES
+def remove_seconds_from_messages(msgs):
+    """
+    removes the seconds from all messages
+    :param msgs: list
+    :return: list
+    """
+    messages = []
+    for msg in msgs:
+        message = msg
+        message["time"] = remove_seconds(message["time"])
+        messages.append(message)
 
+    return messages
+
+
+def remove_seconds(msg):
+    """
+    :return: string with seconds trimmed off
+    """
+    return msg.split(".")[0][:-3]
 
 
 if __name__ == '__main__':
